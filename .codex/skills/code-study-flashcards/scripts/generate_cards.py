@@ -119,6 +119,27 @@ def construir_parser() -> argparse.ArgumentParser:
         help="md = Markdown con la plantilla de assets/ (por defecto). anki = TSV para importar en Anki.",
     )
     parser.add_argument(
+        "--anki-notetype",
+        dest="anki_notetype",
+        metavar="NOMBRE",
+        default=None,
+        help=(
+            "Escribe #notetype en el export de Anki para que el tipo de nota ya "
+            "venga puesto. Depende del idioma de tu Anki: 'Basico' en espanol, "
+            "'Basic' en ingles. Opcional."
+        ),
+    )
+    parser.add_argument(
+        "--anki-deck",
+        dest="anki_deck",
+        metavar="NOMBRE",
+        default=None,
+        help=(
+            "Escribe #deck en el export de Anki para que las tarjetas caigan en "
+            "esa baraja sin elegirla a mano. Opcional."
+        ),
+    )
+    parser.add_argument(
         "--template",
         metavar="RUTA",
         default=str(PLANTILLA_POR_DEFECTO),
@@ -252,6 +273,8 @@ def imprimir_resumen(
     formato: str,
     guia: Guia,
     avisos: Sequence[str],
+    anki_notetype: Optional[str] = None,
+    anki_deck: Optional[str] = None,
 ) -> None:
     """Muestra el informe de ejecucion que el estudiante ve en la terminal."""
     ancho = 64
@@ -281,7 +304,15 @@ def imprimir_resumen(
     print(f" Salida    {ruta_legible(destino)}")
     print("-" * ancho)
     if formato == "anki":
-        print(" Para importar en Anki: Archivo > Importar > tipo 'texto separado por tabuladores'.")
+        print(" Para importar en Anki:")
+        print("   1. Archivo > Importar... > tipo 'texto separado por tabuladores'.")
+        print("   2. Revisa el mapeo: columna 1 al campo Anverso, columna 2 al campo Reverso.")
+        print("      La columna 3 ya va a Etiquetas y las etiquetas ya se aplican solas.")
+        if not anki_deck:
+            print("   3. Elige la baraja de destino en el desplegable.")
+        if not anki_notetype:
+            print("      Para que no tengas que elegirlo a mano, regenera con")
+            print("      --anki-notetype y --anki-deck (ver --help).")
     else:
         print(" Siguiente paso: responde cada tarjeta SIN leer la respuesta; despues compara.")
 
@@ -322,12 +353,26 @@ def ejecutar(args: argparse.Namespace) -> int:
         contenido = render_markdown(plantilla, tarjetas, metadatos)
         destino = Path(args.output) if args.output else ruta_salida_por_defecto(entrada, args.formato)
     else:
-        contenido = render_anki(tarjetas, guia)
+        contenido = render_anki(
+            tarjetas,
+            guia,
+            notetype=args.anki_notetype,
+            deck=args.anki_deck,
+        )
         destino = Path(args.output) if args.output else ruta_salida_por_defecto(entrada, args.formato)
     escribir_salida(destino, contenido)
 
     if not args.quiet:
-        imprimir_resumen(fuentes, tarjetas, destino, args.formato, guia, avisos)
+        imprimir_resumen(
+        fuentes,
+        tarjetas,
+        destino,
+        args.formato,
+        guia,
+        avisos,
+        anki_notetype=args.anki_notetype,
+        anki_deck=args.anki_deck,
+    )
     return SALIDA_OK
 
 

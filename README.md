@@ -110,12 +110,12 @@ python -m unittest discover -s tests
 ```
 
 ```
-Ran 36 tests in 4.0s
+Ran 40 tests in 5.7s
 
 OK
 ```
 
-Que cubren los 36 casos:
+Que cubren los 40 casos:
 
 | Grupo | Que verifica |
 | --- | --- |
@@ -141,7 +141,7 @@ salida esperado). Clic en cualquier imagen para verla a tamano completo.
 
 [![02 errores](.codex/skills/code-study-flashcards/docs/capturas/02-demo-matriz-de-errores.png)](.codex/skills/code-study-flashcards/docs/capturas/02-demo-matriz-de-errores.png)
 
-### 3. Suite de pruebas (36 casos) y cierre de la demo con 13 de 13
+### 3. Suite de pruebas (40 casos) y cierre de la demo con 13 de 13
 
 [![03 tests y cierre](.codex/skills/code-study-flashcards/docs/capturas/03-demo-tests-y-cierre.png)](.codex/skills/code-study-flashcards/docs/capturas/03-demo-tests-y-cierre.png)
 
@@ -329,7 +329,7 @@ El orden importa: primero la pedagogia, despues el formato, luego el codigo.
 5. **Los errores son codigos, no texto.** Se definio un contrato de cinco codigos de
    salida y cada excepcion de dominio los respeta. Un archivo malo en una carpeta no
    aborta la corrida: se omite con aviso.
-6. **Las pruebas se escribieron con la funcionalidad.** Hoy son 36 casos, entre ellos
+6. **Las pruebas se escribieron con la funcionalidad.** Hoy son 40 casos, entre ellos
    un test por codigo de salida, la comparacion de determinismo byte a byte y el
    filtro de codigo generado.
 7. **La prueba de fuego fue el proyecto real.** Ejecutarla en `pids_final_taller`
@@ -360,8 +360,18 @@ Porque la ausencia de documentacion tambien es material de estudio: la tarjeta
 pregunta que hace la funcion y por que no hay nadie que lo documente.
 
 **¿Como importo las tarjetas en Anki?**
-`--format anki` genera TSV con cabecera. En Anki: Archivo > Importar, tipo
-"Basico", separador tabulador, marcar "permitir HTML".
+`--format anki` genera un TSV que se importa en *Archivo > Importar* con el tipo
+"texto separado por tabuladores". En el dialogo solo hay que confirmar el mapeo:
+columna 1 al campo Anverso, columna 2 al campo Reverso. Las etiquetas de la
+columna 3 ya se aplican solas. Si pasas `--anki-notetype` y `--anki-deck`, el
+tipo de nota y la baraja tambien vienen ya puestos.
+
+El export deliberadamente **no** lleva una linea `#columns:`. Segun el manual de
+Anki ese header solo "muestra los nombres dados al importar": no asigna campos.
+Con el, el importador mapeaba la columna 1 y descartaba la 2 en silencio.
+Descubrimos ese bug importando 15 notas que llegaron con el Reverso vacio, y hay
+un test en `tests/` que lo evita. El reverso se genera en HTML, con `<br>` entre
+respuesta y explicacion y el codigo escapado.
 
 **¿El orden de las tarjetas es estable entre ejecuciones?**
 Si. No hay aleatoriedad ni marcas de tiempo variables: la misma entrada produce el

@@ -9,13 +9,16 @@ las rutas personales, para no publicar datos del equipo:
   <PROYECTO>  proyecto de demostracion (pids_final_taller)
   <SKILL>     raiz de la skill
 
+Actualizado despues del arreglo del export de Anki (ver seccion 6 de la guia):
+el paso 3 ya no imprime el `#columns:` y el paso 10 corre 40 casos, no 36.
+
 Como reproducirlo, desde la carpeta de la skill:
 
   scripts\demo.bat
   python scripts\generate_cards.py -i "<PROYECTO>/ai-context/backlog/E3-gestion-de-inventario-y-almacen.md" -o output/pids_notas.md
   python scripts\generate_cards.py -i "<PROYECTO>/taller_back/src/modules/inventory" -o output/pids_codigo.md
 
-Pruebas automatizadas, incluidas en el paso 10 de la parte 1: 36 casos, OK.
+Pruebas automatizadas, incluidas en el paso 10 de la parte 1: 40 casos, OK.
 
 
 ==========================================================================
@@ -85,7 +88,13 @@ code-study-flashcards 1.0.0
    ! recortado de 42 a 3 tarjetas por --max-cards (las primeras 3 en orden de aparicion).
  Salida    output/demo_anki.txt
 ----------------------------------------------------------------
- Para importar en Anki: Archivo > Importar > tipo 'texto separado por tabuladores'.
+ Para importar en Anki:
+  1. Archivo > Importar... > tipo 'texto separado por tabuladores'.
+  2. Revisa el mapeo: columna 1 al campo Anverso, columna 2 al campo Reverso.
+      La columna 3 ya va a Etiquetas y las etiquetas ya se aplican solas.
+  3. Elige la baraja de destino en el desplegable.
+      Para que no tengas que elegirlo a mano, regenera con
+      --anki-notetype y --anki-deck (ver --help).
   [OK] codigo de salida 0 - esperado 0
 Primer registro exportado:
 Que valor tiene `MONEDA` en `examples/input_sample.py` y para que se usa?	Respuesta: MONEDA = 'BOB' | Explicacion: - Constante de modulo (NOMBRE_EN_MAYUSCULAS). - Valor: `'BOB'` - Ubicacion: examples/input_sample.py:14	constante,configuracion,python,facil,regla_R1
@@ -143,11 +152,11 @@ otros : usa --lang py|js|ts|java|c|cpp|cs|php|go|rb|rs|sql|text para forzar el a
   [OK] codigo de salida 2 - esperado 2
 
 ==========================================================================
- 10. Suite de pruebas automatizadas (36 casos)
+ 10. Suite de pruebas automatizadas (40 casos)
 ==========================================================================
 ....................................
 ----------------------------------------------------------------------
-Ran 36 tests in 4.323s
+Ran 40 tests in 5.736s
 
 OK
   [OK] codigo de salida 0 - esperado 0

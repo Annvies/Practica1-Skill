@@ -11,6 +11,7 @@ documentan que ocurre con una entrada invalida.
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 import tempfile
@@ -191,11 +192,93 @@ class ExportAnki(BasePrueba):
         self.assertEqual(resultado.returncode, 0, resultado.stderr)
         lineas = destino.read_text(encoding="utf-8").splitlines()
         self.assertEqual(lineas[0], "#separator:Tab")
-        self.assertIn("#columns:front\tback\ttags", lineas)
+        self.assertIn("#tags column:3", lineas)
         filas = [linea for linea in lineas if linea and not linea.startswith("#")]
         self.assertTrue(filas)
         for fila in filas:
             self.assertEqual(len(fila.split("\t")), 3, f"fila con numero de columnas raro: {fila[:60]}")
+
+    def test_no_emite_header_columns_que_descarta_el_reverso(self) -> None:
+        """Regresion: #columns no asigna campos, Anki tiraba la columna del reverso.
+
+        Segun el manual de Anki, #columns solo cuenta las columnas y muestra sus
+        nombres al importar. Con el, el importador mapeaba la columna 1 al
+        Anverso y descartaba la 2, dejando 15 notas con el Reverso vacio y sin
+        ningun aviso. El export no debe emitirlo.
+        """
+        destino = self.carpeta / "anki.txt"
+        resultado = ejecutar("-i", str(CODIGO_VALIDO), "--format", "anki", "-o", str(destino))
+        self.assertEqual(resultado.returncode, 0, resultado.stderr)
+        lineas = destino.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(
+            [linea for linea in lineas if linea.startswith("#columns:")],
+            [],
+            "el export no debe emitir #columns: porque Anki no lo usa para asignar campos",
+        )
+
+    def test_todas_las_filas_tienen_anverso_y_reverso_rellenos(self) -> None:
+        destino = self.carpeta / "anki.txt"
+        resultado = ejecutar("-i", str(CODIGO_VALIDO), "--format", "anki", "-o", str(destino))
+        self.assertEqual(resultado.returncode, 0, resultado.stderr)
+        filas = [
+            linea
+            for linea in destino.read_text(encoding="utf-8").splitlines()
+            if linea and not linea.startswith("#")
+        ]
+        self.assertTrue(filas)
+        for fila in filas:
+            frente, reverso, etiquetas = fila.split("\t")
+            self.assertTrue(frente.strip(), f"anverso vacio: {fila[:60]}")
+            self.assertTrue(reverso.strip(), f"reverso vacio: {fila[:60]}")
+            self.assertTrue(etiquetas.strip(), f"etiquetas vacias: {fila[:60]}")
+
+    def test_reverso_usa_html_y_escapa_el_codigo(self) -> None:
+        """Con #html:true el reverso usa <br>, y el codigo queda escapado.
+
+        La invariante no es "aparecenangle entities", sino que ningun `<` del
+        reverso pueda ser markup no previsto: comparaciones del codigo fuente
+        (`stock <= 0`) tienen que llegar como `&lt;`.
+        """
+        destino = self.carpeta / "anki.txt"
+        resultado = ejecutar("-i", str(CODIGO_VALIDO), "--format", "anki", "-o", str(destino))
+        self.assertEqual(resultado.returncode, 0, resultado.stderr)
+        texto = destino.read_text(encoding="utf-8")
+        self.assertIn("#html:true", texto.splitlines())
+        filas = [linea for linea in texto.splitlines() if linea and not linea.startswith("#")]
+        reversos = [fila.split("\t")[1] for fila in filas]
+        permitidos = {"<b>", "</b>", "<br>"}
+        escapadas = 0
+        for reverso in reversos:
+            for etiqueta in re.findall(r"<[^>]*>", reverso):
+                self.assertIn(
+                    etiqueta,
+                    permitidos,
+                    f"markup no previsto en el reverso, el codigo no esta escapado: {etiqueta}",
+                )
+            self.assertIn("<b>Respuesta:</b>", reverso)
+            self.assertIn("<br>", reverso)
+            if "&lt;" in reverso or "&gt;" in reverso:
+                escapadas += 1
+        self.assertGreater(
+            escapadas,
+            0,
+            "ningun reverso escapó '<' o '>': el escapado no se está aplicando",
+        )
+
+    def test_anki_notetype_y_deck_se_emiten_solo_si_se_piden(self) -> None:
+        destino = self.carpeta / "anki.txt"
+        ejecutar("-i", str(CODIGO_VALIDO), "--format", "anki", "-o", str(destino))
+        sin_opciones = destino.read_text(encoding="utf-8").splitlines()
+        self.assertEqual([l for l in sin_opciones if l.startswith("#notetype:")], [])
+        self.assertEqual([l for l in sin_opciones if l.startswith("#deck:")], [])
+
+        ejecutar(
+            "-i", str(CODIGO_VALIDO), "--format", "anki", "-o", str(destino),
+            "--anki-notetype", "Basico", "--anki-deck", "code-study-flashcards",
+        )
+        con_opciones = destino.read_text(encoding="utf-8").splitlines()
+        self.assertIn("#notetype:Basico", con_opciones)
+        self.assertIn("#deck:code-study-flashcards", con_opciones)
 
     def test_anki_no_requiere_la_plantilla(self) -> None:
         destino = self.carpeta / "anki.txt"

@@ -67,6 +67,8 @@ bash scripts/demo.sh  # Linux, macOS o Git Bash
 | `--template` | Plantilla alternativa. Por defecto `assets/flashcard_template.md`. |
 | `--guide` | Guia alternativa. Por defecto `references/active_recall_guide.md`. |
 | `--lang` | Fuerza el analizador: `py`, `js`, `ts`, `java`, `c`, `cpp`, `cs`, `php`, `go`, `rb`, `rs`, `swift`, `kt`, `scala`, `sql`, `text`. Por defecto se deduce de la extension. |
+| `--anki-notetype` | Escribe `#notetype:` en el export de Anki. Depende del idioma: `Basico` en espanol, `Basic` en ingles. |
+| `--anki-deck` | Escribe `#deck:` en el export de Anki, para que las tarjetas caigan en esa baraja sin elegirla a mano. |
 | `--max-cards N` | Recorta a N tarjetas (`0` = sin limite). Para sesiones de 10 minutos. |
 | `-r, --recursive` | Al pasar una carpeta, incluye subcarpetas (ignora `.git`, `node_modules`, `dist`, `venv`). |
 | `-q, --quiet` | Suprime el resumen por stdout. |
@@ -146,5 +148,21 @@ code-study-flashcards/
 python -m unittest discover -s tests
 ```
 
-36 casos, sin dependencias. Cubren generacion, extractores, Anki, determinismo,
+40 casos, sin dependencias. Cubren generacion, extractores, Anki, determinismo,
 carga de assets y los cinco codigos de salida.
+
+## Importar en Anki
+
+`--format anki` produce un TSV con `#separator:Tab`, `#html:true` y
+`#tags column:3`, y opcionalmente `#notetype:` y `#deck:` si pasas
+`--anki-notetype` y `--anki-deck`.
+
+En el dialogo de importacion solo hay que confirmar el mapeo: **columna 1 al
+campo Anverso, columna 2 al campo Reverso**. Las etiquetas de la columna 3 ya se
+aplican solas y no hay que mapearlas.
+
+El export **no** emite `#columns:` a proposito. Ese header, segun el manual de
+Anki, solo cuenta las columnas y muestra sus nombres al importar: no asigna
+campos. Con el, el importador mapeaba la columna 1 y descartaba la 2 en
+silencio, y las notas llegaban con el Anverso lleno y el Reverso vacio.
+`tests/test_generate_cards.py` lo verifica para que no vuelva a pasar.

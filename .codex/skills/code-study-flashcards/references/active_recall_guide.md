@@ -265,7 +265,11 @@ patrón en `preguntas`. Marcadores disponibles en los patrones: `{{nombre}}`, `{
   },
   "formato_anki": {
     "separador": "\t",
-    "columnas": ["front", "back", "tags"]
+    "columnas": ["front", "back", "tags"],
+    "html": true,
+    "emitir_header_columns": false,
+    "nota_columns": "No emitir #columns:. Segun el manual de Anki ese header solo cuenta las columnas y muestra sus nombres al importar; no asigna campos. Con el presente el importador descarta la columna del reverso y las notas llegan con el Anverso lleno y el Reverso vacio, sin avisar. Sin ese header, Anki mapea las dos primeras columnas por posicion a los campos del tipo de nota, y #tags column:3 sigue reservando la tercera para las etiquetas.",
+    "nota_html": "Con html:true el reverso puede usar <br> para separar la respuesta de la explicacion. Todo el texto se escapa antes (&, <, >) porque las explicaciones incluyen codigo real."
   }
 }
 ```

@@ -626,27 +626,63 @@ def render_markdown(plantilla: str, tarjetas: Sequence[Tarjeta], meta: Mapping[s
     return "\n\n---\n\n".join(pieza for pieza in piezas if pieza) + "\n"
 
 
-def render_anki(tarjetas: Sequence[Tarjeta], guia: Guia) -> str:
+def escapar_html(texto: str) -> str:
+    """Escapa los tres caracteres que Anki interpretaria como HTML.
+
+    Necesario porque las explicaciones incluyen codigo real (`->`, `<`, `&`) y el
+    export se declara `#html:true` para poder usar `<br>` en el reverso.
+    """
+    return (
+        str(texto)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
+def render_anki(
+    tarjetas: Sequence[Tarjeta],
+    guia: Guia,
+    notetype: Optional[str] = None,
+    deck: Optional[str] = None,
+) -> str:
     """Exporta en formato texto tab-separado, importable desde Anki.
 
-    Cada registro es una sola linea: los saltos de linea internos se convierten
-    en espacios para que el importador de Anki no los confunda con el comienzo
-    de una fila nueva.
+    Cada registro es una sola linea fisica: los saltos de linea internos se
+    convierten en `<br>` para que el importador no los confunda con el comienzo
+    de una fila nueva, y a la vez se vean como lista en la carta.
+
+    No se emite `#columns:` a proposito. Segun el manual de Anki ese header solo
+    "muestra los nombres dados al importar": no asigna campos, asi que el
+    importador descarta silenciosamente la columna del reverso y las tarjetas
+    llegan con el Anverso lleno y el Reverso vacio. Sin ese header, Anki trata
+    las dos primeras columnas como regulares y las mapea por posicion a los
+    campos del tipo de nota, mientras `#tags column:3` sigue reservando la
+    tercera para las etiquetas.
     """
     separador = guia.separador_anki
 
     def una_linea(texto: str) -> str:
-        return " ".join(str(texto).split()).replace(separador, " ")
+        """Escapa el contenido y luego Inserta el markup: nunca al reves.
 
-    lineas = [
-        "#separator:Tab",
-        "#html:false",
-        "#columns:front" + separador + "back" + separador + "tags",
-        "#tags column:3",
-    ]
+        Si se escapara despues de anadir `<b>`, las propias etiquetas quedarian
+        escapadas y Anki las mostraria como texto literal.
+        """
+        limpio = escapar_html(" ".join(str(texto).split()).replace(separador, " "))
+        return limpio.replace("- ", "<br>- ").replace(" | ", "<br>")
+
+    lineas = ["#separator:Tab", "#html:true"]
+    if notetype:
+        lineas.append(f"#notetype:{escapar_html(notetype)}")
+    if deck:
+        lineas.append(f"#deck:{escapar_html(deck)}")
+    lineas.append("#tags column:3")
     for tarjeta in tarjetas:
         frente = una_linea(tarjeta.pregunta)
-        reverso = una_linea(f"Respuesta: {tarjeta.respuesta} | Explicacion: {tarjeta.explicacion}")
+        reverso = (
+            "<b>Respuesta:</b> " + una_linea(tarjeta.respuesta)
+            + "<br><b>Explicacion:</b> " + una_linea(tarjeta.explicacion)
+        )
         etiquetas = [t for t in tarjeta.tags if t]
         if tarjeta.reglas:
             etiquetas.append(f"regla_{tarjeta.reglas[0]}")
