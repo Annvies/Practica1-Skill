@@ -1,0 +1,237 @@
+code-study-flashcards - transcripcion de la demostracion
+=====================================================
+
+Salida literal, sin reescribir, de `scripts/demo.bat` (13 pasos) y de las dos
+corridas sobre el proyecto real pids_final_taller. Lo unico que se sustituyo son
+las rutas personales, para no publicar datos del equipo:
+
+  <USUARIO>  nombre de usuario del equipo donde se ejecuto
+  <PROYECTO>  proyecto de demostracion (pids_final_taller)
+  <SKILL>     raiz de la skill
+
+Como reproducirlo, desde la carpeta de la skill:
+
+  scripts\demo.bat
+  python scripts\generate_cards.py -i "<PROYECTO>/ai-context/backlog/E3-gestion-de-inventario-y-almacen.md" -o output/pids_notas.md
+  python scripts\generate_cards.py -i "<PROYECTO>/taller_back/src/modules/inventory" -o output/pids_codigo.md
+
+Pruebas automatizadas, incluidas en el paso 10 de la parte 1: 36 casos, OK.
+
+
+==========================================================================
+ PARTE 1 - DEMOSTRACION COMPLETA (scripts/demo.bat)
+==========================================================================
+
+
+==========================================================================
+ 0. Version de la skill
+==========================================================================
+code-study-flashcards 1.0.0
+  [OK] codigo de salida 0 - esperado 0
+
+==========================================================================
+ 1. CASO EXITOSO - codigo Python a tarjetas Markdown
+==========================================================================
+----------------------------------------------------------------
+ code-study-flashcards 1.0.0  |  42 tarjetas generadas
+----------------------------------------------------------------
+ Entrada   examples/input_sample.py (py, 3.5 KB, 42 tarjetas)
+   -   9  Parametros (funcion_parametros)
+   -   9  Valor de retorno (funcion_retorno)
+   -   6  Flujo de control (flujo_control)
+   -   6  Hueco de documentacion (funcion_sin_docstring)
+   -   4  Constantes y configuracion (constante_modulo)
+   -   3  Proposito de funcion (funcion_proposito)
+   -   2  Constructor e inicializacion (clase_constructor)
+   -   2  Metodos publicos (clase_metodos)
+   -   1  Estado de la clase (clase_atributos)
+ Reglas    R1 Atomicidad, R2 Recuperacion activa, R3 Una funcion, varias tarjetas, R4 Preguntar el porque, R5 Gap cards
+ Salida    output/demo_tarjetas.md
+----------------------------------------------------------------
+ Siguiente paso: responde cada tarjeta SIN leer la respuesta; despues compara.
+  [OK] codigo de salida 0 - esperado 0
+
+==========================================================================
+ 2. CASO EXITOSO - apuntes Markdown a tarjetas (recorte a 8)
+==========================================================================
+----------------------------------------------------------------
+ code-study-flashcards 1.0.0  |  8 tarjetas generadas
+----------------------------------------------------------------
+ Entrada   examples/notas_sample.md (md, 2.0 KB, 14 tarjetas)
+   -   3  Seccion de apuntes (nota_seccion)
+   -   2  Lista de apuntes (nota_lista)
+   -   1  Codigo embebido en apuntes (codigo_en_notas)
+   -   1  Parametros (funcion_parametros)
+   -   1  Hueco de documentacion (funcion_sin_docstring)
+ Reglas    R1 Atomicidad, R2 Recuperacion activa, R3 Una funcion, varias tarjetas, R5 Gap cards, R6 Contexto minimo, R7 Etiquetado
+ Avisos
+   ! notas_sample.md: linea 38: 5 tarjetas derivadas del bloque de codigo.
+   ! recortado de 14 a 8 tarjetas por --max-cards (las primeras 8 en orden de aparicion).
+ Salida    output/demo_notas.md
+----------------------------------------------------------------
+ Siguiente paso: responde cada tarjeta SIN leer la respuesta; despues compara.
+  [OK] codigo de salida 0 - esperado 0
+
+==========================================================================
+ 3. CASO EXITOSO - export a Anki (texto separado por tabuladores)
+==========================================================================
+----------------------------------------------------------------
+ code-study-flashcards 1.0.0  |  3 tarjetas generadas
+----------------------------------------------------------------
+ Entrada   examples/input_sample.py (py, 3.5 KB, 42 tarjetas)
+   -   3  Constantes y configuracion (constante_modulo)
+ Reglas    R1 Atomicidad, R2 Recuperacion activa
+ Avisos
+   ! recortado de 42 a 3 tarjetas por --max-cards (las primeras 3 en orden de aparicion).
+ Salida    output/demo_anki.txt
+----------------------------------------------------------------
+ Para importar en Anki: Archivo > Importar > tipo 'texto separado por tabuladores'.
+  [OK] codigo de salida 0 - esperado 0
+Primer registro exportado:
+Que valor tiene `MONEDA` en `examples/input_sample.py` y para que se usa?	Respuesta: MONEDA = 'BOB' | Explicacion: - Constante de modulo (NOMBRE_EN_MAYUSCULAS). - Valor: `'BOB'` - Ubicacion: examples/input_sample.py:14	constante,configuracion,python,facil,regla_R1
+
+
+==========================================================================
+ 4. ERROR - el archivo no existe  (se espera 3)
+==========================================================================
+[ERROR: entrada no encontrada] La entrada '<SKILL>\examples\no_existe.py' no existe.
+  Sugerencia: Revisa la ruta pasada a -i/--input; se resuelve desde el directorio actual.
+  [OK] codigo de salida 3 - esperado 3
+
+==========================================================================
+ 5. ERROR - archivo vacio  (se espera 3)
+==========================================================================
+[ERROR: entrada vacia] El archivo '<SKILL>\examples\empty_sample.py' esta vacio (0 bytes utiles).
+  Sugerencia: Un archivo vacio no tiene conceptos que revisar: aniade codigo o notas y vuelve a intentarlo.
+  [OK] codigo de salida 3 - esperado 3
+
+==========================================================================
+ 6. ERROR - formato no soportado  (se espera 3)
+==========================================================================
+[ERROR: formato no soportado] Formato no soportado para 'unsupported_sample.pdf' (extension '.pdf').
+  Sugerencia: codigo: .c, .cc, .cjs, .cpp, .cs, .go, .h, .hpp, .java, .js, .jsx, .kt, .mjs, .php, .py, .rb, .rs, .scala, .sql, .swift, .ts, .tsx
+notas : .markdown, .md, .rst, .txt
+otros : usa --lang py|js|ts|java|c|cpp|cs|php|go|rb|rs|sql|text para forzar el analisis
+  [OK] codigo de salida 3 - esperado 3
+
+==========================================================================
+ 7. ERROR - codigo Python con error de sintaxis  (se espera 3)
+==========================================================================
+[ERROR: codigo no parseable] 'broken_syntax_sample.py' no es Python valido (linea 1): invalid syntax
+  Sugerencia: Corrige el error de sintaxis. Si el archivo es pseudocodigo o texto plano, renombralo a .md/.txt o ejecuta con --lang text.
+  [OK] codigo de salida 3 - esperado 3
+
+==========================================================================
+ 8. ERROR - plantilla de assets ausente  (se espera 4)
+==========================================================================
+[ERROR: plantilla invalida] No se encontro la plantilla: <SKILL>\assets\no_existe.md
+  Sugerencia: Instala la skill completa (deben existir assets/ y references/). En un clon: revisa que no falte ningun archivo versionado.
+  [OK] codigo de salida 4 - esperado 4
+
+==========================================================================
+ 9. ERROR - carpeta sin formatos soportados  (se espera 3)
+==========================================================================
+[ERROR: entrada no encontrada] La carpeta '<SKILL>\output\carpeta_vacia' no contiene archivos con formato soportado.
+  Sugerencia: Formatos aceptados: .py .js .jsx .ts .tsx .java .c .cpp .cs .php .go .rb .rs .kt .swift .scala .sql .md .txt .rst. Usa -r para incluir subcarpetas.
+  [OK] codigo de salida 3 - esperado 3
+
+==========================================================================
+ 9b. ERROR - uso incorrecto: --max-cards negativo  (se espera 2)
+==========================================================================
+[ERROR: uso incorrecto] --max-cards no puede ser negativo.
+  Sugerencia: Usa 0 para no limitar el numero de tarjetas.
+  [OK] codigo de salida 2 - esperado 2
+
+==========================================================================
+ 10. Suite de pruebas automatizadas (36 casos)
+==========================================================================
+....................................
+----------------------------------------------------------------------
+Ran 36 tests in 4.323s
+
+OK
+  [OK] codigo de salida 0 - esperado 0
+
+==========================================================================
+ 11. Recorrido de una carpeta completa (caso mixto)
+==========================================================================
+----------------------------------------------------------------
+ code-study-flashcards 1.0.0  |  20 tarjetas generadas
+----------------------------------------------------------------
+ Entrada   examples/demo_transcript.txt (txt, 13.4 KB, 5 tarjetas)
+ Entrada   examples/expected_output.md (md, 8.4 KB, 15 tarjetas)
+ Entrada   examples/input_sample.js (js, 1.0 KB, 9 tarjetas)
+ Entrada   examples/input_sample.py (py, 3.5 KB, 42 tarjetas)
+ Entrada   examples/input_sample.ts (ts, 2.2 KB, 14 tarjetas)
+ Entrada   examples/notas_sample.md (md, 2.0 KB, 14 tarjetas)
+   -   8  Codigo embebido en apuntes (codigo_en_notas)
+   -   7  Seccion de apuntes (nota_seccion)
+   -   5  Lista de apuntes (nota_lista)
+ Reglas    R1 Atomicidad, R2 Recuperacion activa, R3 Una funcion, varias tarjetas, R6 Contexto minimo, R7 Etiquetado
+ Avisos
+   ! omitido broken_syntax_sample.py: no es Python valido (linea 1): invalid syntax
+   ! omitido empty_sample.py: El archivo '' esta vacio (0 bytes utiles).
+   ! input_sample.js: analisis heuristico: no hay AST estandar para javascript en la libreria estandar.
+   ! input_sample.ts: analisis heuristico: no hay AST estandar para typescript en la libreria estandar.
+   ! notas_sample.md: linea 38: 5 tarjetas derivadas del bloque de codigo.
+   ! recortado de 99 a 20 tarjetas por --max-cards (las primeras 20 en orden de aparicion).
+ Salida    output/demo_carpeta.md
+----------------------------------------------------------------
+ Siguiente paso: responde cada tarjeta SIN leer la respuesta; despues compara.
+  [OK] codigo de salida 0 - esperado 0
+
+==========================================================================
+ Archivos generados
+==========================================================================
+demo_anki.txt
+demo_carpeta.md
+demo_notas.md
+demo_tarjetas.md
+
+==========================================================================
+ DEMO COMPLETADA: 13 de 13 pasos con el codigo de salida esperado.
+==========================================================================
+
+
+==========================================================================
+ PARTE 2 - PROYECTO REAL: apuntes de integracion (E3)
+==========================================================================
+
+----------------------------------------------------------------
+ code-study-flashcards 1.0.0  |  37 tarjetas generadas
+----------------------------------------------------------------
+ Entrada   <PROYECTO>/ai-context/backlog/E3-gestion-de-inventario-y-almacen.md (md, 31.4 KB, 37 tarjetas)
+   -  15  Seccion de apuntes (nota_seccion)
+   -   9  Codigo embebido en apuntes (codigo_en_notas)
+   -   7  Lista de apuntes (nota_lista)
+   -   6  Termino clave (nota_termino)
+ Reglas    R1 Atomicidad, R2 Recuperacion activa, R3 Una funcion, varias tarjetas, R6 Contexto minimo, R7 Etiquetado
+ Salida    output/pids_notas.md
+----------------------------------------------------------------
+ Siguiente paso: responde cada tarjeta SIN leer la respuesta; despues compara.
+
+
+==========================================================================
+ PARTE 3 - PROYECTO REAL: codigo del modulo de inventario
+==========================================================================
+
+----------------------------------------------------------------
+ code-study-flashcards 1.0.0  |  23 tarjetas generadas
+----------------------------------------------------------------
+ Entrada   <PROYECTO>/taller_back/src/modules/inventory/inventory-alerts.controller.ts (ts, 1.2 KB, 3 tarjetas)
+ Entrada   <PROYECTO>/taller_back/src/modules/inventory/inventory.controller.ts (ts, 3.9 KB, 7 tarjetas)
+ Entrada   <PROYECTO>/taller_back/src/modules/inventory/inventory.module.ts (ts, 0.7 KB, 1 tarjeta)
+ Entrada   <PROYECTO>/taller_back/src/modules/inventory/inventory.service.ts (ts, 5.6 KB, 12 tarjetas)
+   -  17  Proposito de funcion (funcion_proposito)
+   -   4  Estado de la clase (clase_atributos)
+   -   1  Constantes y configuracion (constante_modulo)
+   -   1  Flujo de control (flujo_control)
+ Reglas    R1 Atomicidad, R2 Recuperacion activa, R3 Una funcion, varias tarjetas, R4 Preguntar el porque
+ Avisos
+   ! inventory-alerts.controller.ts: analisis heuristico: no hay AST estandar para typescript en la libreria estandar.
+   ! inventory.controller.ts: analisis heuristico: no hay AST estandar para typescript en la libreria estandar.
+   ! inventory.module.ts: analisis heuristico: no hay AST estandar para typescript en la libreria estandar.
+   ! inventory.service.ts: analisis heuristico: no hay AST estandar para typescript en la libreria estandar.
+ Salida    output/pids_codigo.md
+----------------------------------------------------------------
+ Siguiente paso: responde cada tarjeta SIN leer la respuesta; despues compara.

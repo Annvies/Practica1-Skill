@@ -1,0 +1,1 @@
+﻿Este archivo tiene extension .pdf a proposito para demostrar el error de formato no soportado. Es texto plano, no un PDF real: el script debe rechazarlo por la extension, no por su contenido.

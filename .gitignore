@@ -3,6 +3,11 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Salidas generadas por code-study-flashcards (se regeneran con demo.bat / demo.sh)
+output/
+*_flashcards.md
+*_flashcards.txt
+
 # C extensions
 *.so
 
