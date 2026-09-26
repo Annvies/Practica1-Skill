@@ -349,6 +349,13 @@ def ejecutar(args: argparse.Namespace) -> int:
         tarjetas = tarjetas[: args.max_cards]
 
     metadatos = construir_metadatos(entrada, fuentes, tarjetas, guia)
+    if args.anki_notetype and not args.anki_notetype.isascii():
+        avisos.append(
+            f"el tipo de nota '{args.anki_notetype}' lleva acentos: la consola de "
+            "Windows puede haberlos cambiado al recibir el argumento. Anki solo "
+            "preselecciona el tipo si el nombre existe tal cual, asi que "
+            "confirmalo en el dialogo de importacion."
+        )
     if args.formato == "md":
         contenido = render_markdown(plantilla, tarjetas, metadatos)
         destino = Path(args.output) if args.output else ruta_salida_por_defecto(entrada, args.formato)

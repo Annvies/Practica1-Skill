@@ -373,6 +373,12 @@ Descubrimos ese bug importando 15 notas que llegaron con el Reverso vacio, y hay
 un test en `tests/` que lo evita. El reverso se genera en HTML, con `<br>` entre
 respuesta y explicacion y el codigo escapado.
 
+Un detalle de Windows: `Básico` lleva acento, y la consola clasica puede
+alterarlo al pasar el argumento (`Básico` llega como `Básico` o `Basico`). Por eso
+el generador avisa por terminal cuando el nombre del tipo no es ASCII. No pasa
+nada: Anki solo usa ese header para preseleccionar el tipo, y el mapeo de las
+columnas lo haces tu en el dialogo.
+
 **¿El orden de las tarjetas es estable entre ejecuciones?**
 Si. No hay aleatoriedad ni marcas de tiempo variables: la misma entrada produce el
 mismo archivo. Por eso los tests pueden comparar salidas completas.

@@ -69,6 +69,13 @@ bash scripts/demo.sh  # Linux, macOS o Git Bash
 | `--lang` | Fuerza el analizador: `py`, `js`, `ts`, `java`, `c`, `cpp`, `cs`, `php`, `go`, `rb`, `rs`, `swift`, `kt`, `scala`, `sql`, `text`. Por defecto se deduce de la extension. |
 | `--anki-notetype` | Escribe `#notetype:` en el export de Anki. Depende del idioma: `Basico` en espanol, `Basic` en ingles. |
 | `--anki-deck` | Escribe `#deck:` en el export de Anki, para que las tarjetas caigan en esa baraja sin elegirla a mano. |
+
+Anki solo preselecciona el tipo de nota si el nombre existe **tal cual**, y
+conserva el nombre que le des. La consola clasica de Windows puede cambiar los
+acentos al pasar el argumento (un `Básico` llega como `Basico` o `Básico`), por
+eso el generador avisa por terminal cuando el nombre no es ASCII. Si ocurre,
+elige el tipo a mano en el dialogo: ningun dato se pierde, porque el mapeo de
+las columnas se hace alli.
 | `--max-cards N` | Recorta a N tarjetas (`0` = sin limite). Para sesiones de 10 minutos. |
 | `-r, --recursive` | Al pasar una carpeta, incluye subcarpetas (ignora `.git`, `node_modules`, `dist`, `venv`). |
 | `-q, --quiet` | Suprime el resumen por stdout. |
